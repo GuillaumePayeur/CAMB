@@ -38,7 +38,7 @@ class DarkEnergyEqnOfState(DarkEnergyModel):
 
     _methods_ = [('SetWTable', [numpy_1d, numpy_1d, POINTER(c_int)])]
 
-    def set_params(self, w=-1.0, wa=0, cs2=1.0):
+    def set_params(self, tanhA, tanhB, tanhC, w=-1.0, wa=0, cs2=1.0):
         """
          Set the parameters so that P(a)/rho(a) = w(a) = w + (1-a)*wa
 
@@ -49,6 +49,10 @@ class DarkEnergyEqnOfState(DarkEnergyModel):
         self.w = w
         self.wa = wa
         self.cs2 = cs2
+        self.use_tabulated_w = True
+        aarr = np.logspace(-5,0,100)
+        warr = -(tanhA/2)*np.tanh(10**(tanhB)*(aarr**(-1)-1+tanhC))+((tanhA/2)-1)
+        self.set_w_a_table(aarr, warr)
         self.validate_params()
 
     def validate_params(self):
