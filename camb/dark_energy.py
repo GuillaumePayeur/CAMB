@@ -38,22 +38,59 @@ class DarkEnergyEqnOfState(DarkEnergyModel):
 
     _methods_ = [('SetWTable', [numpy_1d, numpy_1d, POINTER(c_int)])]
 
-    def set_params(self, tanhA, tanhB, tanhC, w=-1.0, wa=0, cs2=1.0):
-        """
-         Set the parameters so that P(a)/rho(a) = w(a) = w + (1-a)*wa
+# set_params for the tanh function
+   def set_params(self, tanhA, tanhB, tanhC, w=-1.0, wa=0, cs2=1.0):
+       """
+        Set the parameters so that P(a)/rho(a) = w(a) = w + (1-a)*wa
 
-        :param w: w(0)
-        :param wa: -dw/da(0)
-        :param cs2: fluid rest-frame sound speed squared
-        """
-        self.w = w
-        self.wa = wa
-        self.cs2 = cs2
-        self.use_tabulated_w = True
-        aarr = np.logspace(-5,0,100)
-        warr = -(tanhA/2)*np.tanh(10**(tanhB)*(aarr**(-1)-1+tanhC))+((tanhA/2)-1)
-        self.set_w_a_table(aarr, warr)
-        self.validate_params()
+       :param w: w(0)
+       :param wa: -dw/da(0)
+       :param cs2: fluid rest-frame sound speed squared
+       """
+       self.w = w
+       self.wa = wa
+       self.cs2 = cs2
+       self.use_tabulated_w = True
+       aarr = np.logspace(-5,0,1000)
+       warr = -(tanhA/2)*np.tanh(10**(tanhB)*(aarr**(-1)-1+tanhC))+((tanhA/2)-1)
+       self.set_w_a_table(aarr, warr)
+       self.validate_params()
+
+# set_params for the tanh function, with fixed B
+#    def set_params(self, tanhA, tanhC, w=-1.0, wa=0, cs2=1.0):
+#        """
+#         Set the parameters so that P(a)/rho(a) = w(a) = w + (1-a)*wa
+#
+#        :param w: w(0)
+#        :param wa: -dw/da(0)
+#        :param cs2: fluid rest-frame sound speed squared
+#        """
+#        self.w = w
+#        self.wa = wa
+#        self.cs2 = cs2
+#        self.use_tabulated_w = True
+#        aarr = np.logspace(-5,0,1000)
+#        warr = -(tanhA/2)*np.tanh(10**(1.5)*(aarr**(-1)-1+tanhC))+((tanhA/2)-1)
+#        self.set_w_a_table(aarr, warr)
+#        self.validate_params()
+
+# set_params for the CPL parametrization
+#    def set_params(self, cplw0, cplwa, w=-1.0, wa=0, cs2=1.0):
+#        """
+#         Set the parameters so that P(a)/rho(a) = w(a) = w + (1-a)*wa
+#
+#        :param w: w(0)
+#        :param wa: -dw/da(0)
+#        :param cs2: fluid rest-frame sound speed squared
+#        """
+#        self.w = w
+#        self.wa = wa
+#        self.cs2 = cs2
+#        self.use_tabulated_w = True
+#        aarr = np.logspace(-5,0,1000)
+#        warr = cplw0+cplwa*(1-aarr)
+#        self.set_w_a_table(aarr, warr)
+#        self.validate_params()
 
     def validate_params(self):
         if not self.use_tabulated_w and self.wa + self.w > 0:
